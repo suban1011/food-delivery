@@ -11,7 +11,7 @@ const ResturantSignUp = ({ setLogin }) => {
   };
   return (
     <>
-      <div className="py-8">
+      <div className="py-2">
         <form action="" onSubmit={handleRegister}>
           <h1 className="text-2xl px-8 font-semibold font font-serif  text-gray-600">
             Resgistration
