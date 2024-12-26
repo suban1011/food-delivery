@@ -68,30 +68,35 @@ const RestaurantSignUp = ({ setLogin }) => {
     // Validation check
     if (!validateForm()) return;
 
-    console.log("Form Data: ", restaurant);
-
     try {
       const response = await axios.post(
         "http://localhost:3000/api/restaurant",
         restaurant
       ); // API Call
-      toast.success(response.data.message, { position: "top-center" });
-      console.log("Response: ", response);
+      if (response.data.message) {
+        toast.success(response.data.message, { position: "top-center" });
+      }
+      if (response.data.warning) {
+        toast.warning(response.data.warning, { position: "top-center" });
+      }
 
       // Clear form after success
-      setRestaurant({
-        name: "",
-        email: "",
-        password: "",
-        cPassword: "",
-        city: "",
-        address: "",
-        restaurantName: "",
-        phone: "",
-      });
+      if (response.data.success) {
+        setRestaurant({
+          name: "",
+          email: "",
+          password: "",
+          cPassword: "",
+          city: "",
+          address: "",
+          restaurantName: "",
+          phone: "",
+        });
+        setLogin(true);
+      }
     } catch (error) {
       console.error("Registration Failed: ", error);
-      toast.error(error.response?.data?.message || "Registration Failed!", {
+      toast.error(error.response.data.error, {
         position: "top-center",
       });
     }

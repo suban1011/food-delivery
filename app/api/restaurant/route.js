@@ -1,7 +1,7 @@
 import dbConnect from "@/app/lib/dbConnect";
 import { RestaurantModel } from "@/app/lib/resturantModel";
-
 import { NextResponse } from "next/server";
+import { HashPassword } from "../helpers/hashedPassword";
 
 export async function GET() {
   // Ensure database connection
@@ -18,12 +18,14 @@ export async function GET() {
     console.error(error);
     return NextResponse.json(
       restaurant,
-      { error: "Internal server error", success: true },
+      { error: "Internal server error", success: false },
       { status: 200 }
     );
   }
 }
 
+
+//register restaurant
 export async function POST(req) {
   // Connect to the database
   await dbConnect();
@@ -35,10 +37,18 @@ export async function POST(req) {
       body;
 
     // // Validation checks
-    if (!name || !email || !password) {
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !address ||
+      !phone ||
+      !city ||
+      !restaurantName
+    ) {
       return NextResponse.json(
-        { message: "Name, email, and password are required!" },
-        { status: 400 }
+        { warning: "All fields are required!", success: false },
+        { status: 201 }
       );
     }
 
@@ -46,16 +56,18 @@ export async function POST(req) {
     const existingUser = await RestaurantModel.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { message: "Email is already registered!" },
-        { status: 400 }
+        { warning: "Email is already registered!", success: false },
+        { status: 201 }
       );
     }
+    //hashing password
+    const hashedPassword = HashPassword(password);
 
     // Create a new restaurant instance
     const newRestaurant = new RestaurantModel({
       name,
       email,
-      password, // Note: Hash the password before saving in production!
+      password: hashedPassword, // Note: Hash the password before saving in production!
       address,
       phone,
       city,
@@ -67,13 +79,17 @@ export async function POST(req) {
 
     // Return success response
     return NextResponse.json(
-      { message: "Registration successful!", data: newRestaurant },
+      {
+        message: "Registration successful please login!",
+        data: newRestaurant,
+        success: true,
+      },
       { status: 201 }
     );
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { message: "Registration failed!", error },
+      { error: "Registration failed..!", error, success: false },
       { status: 500 }
     );
   }
