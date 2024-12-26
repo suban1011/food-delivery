@@ -1,6 +1,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-
+  import { ToastContainer, toast } from "react-toastify";
 // Configure Poppins font
 const poppins = Poppins({
   subsets: ["latin"], // Supports Latin characters
@@ -16,7 +16,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body>{children}</body>
+      <body>
+        <ToastContainer />
+        {children}
+      </body>
     </html>
   );
 }

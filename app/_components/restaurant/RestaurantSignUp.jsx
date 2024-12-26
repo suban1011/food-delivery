@@ -1,43 +1,99 @@
 "use client";
+
+import axios from "axios";
 import React, { useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { registerResturant } from "@/app/services/resturantServices"; // Ensure this service function exists!
+import { toast } from "react-toastify";
 
-const ResturantSignUp = ({ setLogin }) => {
+const RestaurantSignUp = ({ setLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setConShowPassword] = useState(false);
 
   // Form data state
-  const [resturant, setResturant] = useState({
+  const [restaurant, setRestaurant] = useState({
     name: "",
     email: "",
     password: "",
     cPassword: "",
     city: "",
     address: "",
-    resturantName: "",
+    restaurantName: "",
     phone: "",
   });
+
+  // Handle form input changes
+  const handleChange = (e) => {
+    setRestaurant({ ...restaurant, [e.target.name]: e.target.value });
+  };
+
+  // Validation function
+  const validateForm = () => {
+    const { email, password, cPassword, phone } = restaurant;
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.warning("Invalid email format!", { position: "top-center" });
+      return false;
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      toast.warning("Password must be at least 6 characters long!", {
+        position: "top-center",
+      });
+      return false;
+    }
+
+    // Confirm password match
+    if (password !== cPassword) {
+      toast.warning("Passwords do not match!", { position: "top-center" });
+      return false;
+    }
+
+    // Phone validation (10-15 digits)
+    const phoneRegex = /^[0-9]{10,15}$/;
+    if (!phoneRegex.test(phone)) {
+      toast.warning("Invalid phone number!", { position: "top-center" });
+      return false;
+    }
+
+    return true;
+  };
 
   // Handle Register
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // Validation
-    if (resturant.password !== resturant.cPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+    // Validation check
+    if (!validateForm()) return;
 
-    console.log("Form Data: ", resturant);
+    console.log("Form Data: ", restaurant);
 
     try {
-      const response = await registerResturant(resturant); // API Call
+      const response = await axios.post(
+        "http://localhost:3000/api/restaurant",
+        restaurant
+      ); // API Call
+      toast.success(response.data.message, { position: "top-center" });
       console.log("Response: ", response);
-      alert("Registration Successful!");
+
+      // Clear form after success
+      setRestaurant({
+        name: "",
+        email: "",
+        password: "",
+        cPassword: "",
+        city: "",
+        address: "",
+        restaurantName: "",
+        phone: "",
+      });
     } catch (error) {
       console.error("Registration Failed: ", error);
-      alert("Registration Failed!");
+      toast.error(error.response?.data?.message || "Registration Failed!", {
+        position: "top-center",
+      });
     }
   };
 
@@ -49,58 +105,58 @@ const ResturantSignUp = ({ setLogin }) => {
             Registration
           </h1>
           <div className="flex flex-col mx-8 gap-3 mt-10">
-            {/* Inputs */}
+            {/* Input fields */}
             <input
-              value={resturant.name}
-              onChange={(e) =>
-                setResturant({ ...resturant, name: e.target.value })
-              }
+              required
+              name="name"
+              value={restaurant.name}
+              onChange={handleChange}
               type="text"
               placeholder="Name"
               className="border-2 rounded px-4 py-2"
             />
             <input
-              value={resturant.email}
-              onChange={(e) =>
-                setResturant({ ...resturant, email: e.target.value })
-              }
+              required
+              name="email"
+              value={restaurant.email}
+              onChange={handleChange}
               type="email"
               placeholder="Email"
               className="border-2 rounded px-4 py-2"
             />
             <input
-              value={resturant.resturantName}
-              onChange={(e) =>
-                setResturant({ ...resturant, resturantName: e.target.value })
-              }
+              required
+              name="restaurantName"
+              value={restaurant.restaurantName}
+              onChange={handleChange}
               type="text"
               placeholder="Restaurant Name"
               className="border-2 rounded px-4 py-2"
             />
             <input
-              value={resturant.city}
-              onChange={(e) =>
-                setResturant({ ...resturant, city: e.target.value })
-              }
+              required
+              name="city"
+              value={restaurant.city}
+              onChange={handleChange}
               type="text"
               placeholder="City"
               className="border-2 rounded px-4 py-2"
             />
             <input
-              value={resturant.address}
-              onChange={(e) =>
-                setResturant({ ...resturant, address: e.target.value })
-              }
+              required
+              name="address"
+              value={restaurant.address}
+              onChange={handleChange}
               type="text"
               placeholder="Full Address"
               className="border-2 rounded px-4 py-2"
             />
             <input
-              value={resturant.phone}
-              onChange={(e) =>
-                setResturant({ ...resturant, phone: e.target.value })
-              }
-              type="number"
+              required
+              name="phone"
+              value={restaurant.phone}
+              onChange={handleChange}
+              type="text"
               placeholder="Phone Number"
               className="border-2 rounded px-4 py-2"
             />
@@ -108,10 +164,10 @@ const ResturantSignUp = ({ setLogin }) => {
             {/* Password Field */}
             <div className="relative flex items-center">
               <input
-                value={resturant.password}
-                onChange={(e) =>
-                  setResturant({ ...resturant, password: e.target.value })
-                }
+                required
+                name="password"
+                value={restaurant.password}
+                onChange={handleChange}
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 className="border-2 rounded px-4 py-2 w-full pr-10"
@@ -132,10 +188,10 @@ const ResturantSignUp = ({ setLogin }) => {
             {/* Confirm Password Field */}
             <div className="relative flex items-center">
               <input
-                value={resturant.cPassword}
-                onChange={(e) =>
-                  setResturant({ ...resturant, cPassword: e.target.value })
-                }
+                required
+                name="cPassword"
+                value={restaurant.cPassword}
+                onChange={handleChange}
                 type={showConfPassword ? "text" : "password"}
                 placeholder="Confirm Password"
                 className="border-2 rounded px-4 py-2 w-full pr-10"
@@ -153,7 +209,6 @@ const ResturantSignUp = ({ setLogin }) => {
               )}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               className="bg-indigo-600 text-white px-3 py-2 rounded-md my-2"
@@ -161,7 +216,6 @@ const ResturantSignUp = ({ setLogin }) => {
               Sign Up
             </button>
 
-            {/* Already Registered */}
             <div className="flex justify-center gap-3">
               <p>Already registered?</p>
               <span
@@ -178,4 +232,4 @@ const ResturantSignUp = ({ setLogin }) => {
   );
 };
 
-export default ResturantSignUp;
+export default RestaurantSignUp;

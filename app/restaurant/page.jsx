@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import ResturantLogin from "../_components/resturant/ResturantLogin";
-import ResturantSignUp from "../_components/resturant/ResturantSignUp";
-import ResturantHeader from "../_components/resturant/ResturantHeader";
-import ResturantFooter from "../_components/resturant/ResturantFooter";
+import ResturantLogin from "../_components/restaurant/RestaurantLogin";
+import ResturantSignUp from "../_components/restaurant/RestaurantSignUp";
+import ResturantHeader from "../_components/restaurant/RestaurantHeader";
+import ResturantFooter from "../_components/restaurant/RestaurantFooter";
 
 const Resturant = () => {
   const [login, setLogin] = useState(true);
